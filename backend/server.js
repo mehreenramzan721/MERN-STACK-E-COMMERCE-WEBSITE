@@ -9,13 +9,6 @@ process.on('uncaughtException', err => {
     process.exit(1);
 });
 
-// cast error:  mongo db incomplete id error
-if (err.name === 'CastError') {
-    const message = `Resource not found. Invalid: ${err.path}`;
-    err = new ErrorHandler(message, 400);
-}
-
-
 //config:
 dotenv.config({ path: 'backend/config/config.env' });
 
@@ -25,8 +18,7 @@ connectDB();
 
 // setting up server
 const server = app.listen(process.env.PORT, () => {
-    console.log(`Server is running on port https://localhost:${process.env.PORT}`);
-
+    console.log(`Server is running on port http://localhost:${process.env.PORT}`);
 })
 
 // unhandled promise rejection
