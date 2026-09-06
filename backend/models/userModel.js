@@ -60,4 +60,12 @@ userSchema.methods.getJWTToken = function () {
         expiresIn: process.env.JWT_EXPIRE,
     });
 };
+
+// compare user password
+userSchema.methods.comparePassword = async function (enteredPassword) {
+    return await bcrypt.compare(enteredPassword, this.password);
+    // this. password is the hashed password stored in the database,
+    //  and enteredPassword is the password entered by the user during login.
+    //  The bcrypt.compare function will hash the enteredPassword and compare it with the hashed password stored in the database. If they match, it will return true, otherwise false.
+}
 module.exports = mongoose.model('User', userSchema);
