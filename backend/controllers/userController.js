@@ -63,7 +63,7 @@ exports.logout = catchAsyncErrors(async (req, res, next) => {
 // forgot password
 exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
     const user = await User.findOne({ email: req.body.email });
-    if(!user){
+    if (!user) {
         return next(new ErrorHandler("User not found with this email", 404));
     }
     // get reset token
@@ -73,7 +73,7 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
 
     const resetPasswordUrl = `${req.protocol}://${req.get("host")}/api/v1/password/reset/${resetToken}`
     const message = `Your password reset token is :- \n\n ${resetPasswordUrl} \n\nIf you have not requested this email then, please ignore it.`;
-    try{
+    try {
         await sendEmail({
             email: user.email,
             subject: `Ecommerce Password Recovery`,
@@ -84,8 +84,8 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
             message: `Email sent to ${user.email} successfully`
         })
 
-        
-    }catch(error){
+
+    } catch (error) {
         user.resetPasswordToken = undefined;
         user.resetPasswordExpire = undefined;
         await user.save({ validateBeforeSave: false });
@@ -97,21 +97,21 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
 exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
     // creating token hash 
     const resetPasswordToken = crypto
-            .createHash('sha256')
-            .update(req.params.token)
-            .digest('hex');
+        .createHash('sha256')
+        .update(req.params.token)
+        .digest('hex');
 
     const user = await User.findOne({
         // we have filters in the curly brackets 
         resetPasswordToken,
-        resetPasswordExpire:{ $gt: Date.now()},
+        resetPasswordExpire: { $gt: Date.now() },
     })
 
-    if(!user){
+    if (!user) {
         return next(new ErrorHandler("Reset password token is invalid or has been expired ", 404));
-   
+
     }
-    if(req.body.password !== req.body.confirmPassword){
+    if (req.body.password !== req.body.confirmPassword) {
         return next(new ErrorHandler("Password not matched ", 404));
 
     }
