@@ -1,6 +1,6 @@
 # MERN Stack E-Commerce Website
 
-This is the backend for a MERN stack e-commerce app. It's built with Node.js, Express, and MongoDB, and handles two main things: user accounts (registering, logging in, resetting a forgotten password) and products (creating, viewing, updating, and deleting them). Only admins are allowed to manage products — everyone else can just browse them.
+This is the backend for a MERN stack e-commerce app. It's built with Node.js, Express, and MongoDB, and handles two main things: user accounts (registering, logging in, resetting a forgotten password) and products (creating, viewing, updating, and deleting them). Only admins are allowed to manage products ,everyone else can just browse them.
 
 ## What's Under the Hood
 
@@ -8,7 +8,7 @@ The backend leans on a handful of well-known packages to do the heavy lifting:
 
 - **Express** runs the server and routes requests to the right place.
 - **Mongoose** talks to MongoDB for us.
-- **bcryptjs** hashes passwords before they ever touch the database, so no one's real password is sitting there in plain text.
+- **bcryptjs** hashes passwords before they ever touch the database, so that no one's password can be seen by the admin or any other. 
 - **jsonwebtoken** creates and checks the login tokens that keep a user signed in.
 - **cookie-parser** reads that token back out of the cookie sent with each request.
 - **nodemailer** sends the actual email when someone requests a password reset.
@@ -16,15 +16,15 @@ The backend leans on a handful of well-known packages to do the heavy lifting:
 - **dotenv** pulls in environment variables from a config file instead of hardcoding them.
 - **nodemon** just restarts the server for you automatically while you're developing, so you're not doing it by hand every time you save a file.
 
-## How the Project's Laid Out
+## Projects Structure
 
 ```
 backend/
 ├── config/
-│   ├── config.env          # your environment variables live here, kept out of Git
+│   ├── config.env          # environment variables live here, kept out of Git
 │   └── database.js         # connects to MongoDB
 ├── controllers/
-│   ├── userController.js   # register, login, logout, password reset logic
+│   ├── userController.js   # register, login, logout, password reset **logic**
 │   └── productController.js# create, read, update, delete logic for products
 ├── middleware/
 │   ├── auth.js             # checks if you're logged in, and what role you have
@@ -50,7 +50,7 @@ backend/
 Start by cloning the repo and installing everything it needs:
 
 ```bash
-git clone <your-repo-url>
+git clone <https://github.com/mehreenramzan721/MERN-STACK-E-COMMERCE-WEBSITE>
 cd mern-stack-e-commerce
 npm install
 ```
@@ -98,17 +98,24 @@ Registering is a simple `POST /register` with a name, email, and password — th
 
 Logging in is `POST /login`, and it hands back a JWT token both as an httpOnly cookie and in the response body. Logging out is a `GET /logout`, which just clears that cookie.
 
-Forgetting your password kicks off at `POST /password/forgot` — this generates a random token, saves a hashed version of it on the user's record, and emails the real version as a reset link. That link is only good for 10 minutes. Actually resetting the password happens at `PUT /password/reset/:token`, using the token from that email.
+Forgetting your password kicks off at `POST /password/forgot` — this generates a random token, saves a hashed version of it on the user's record, and emails the real version as a reset link. That link is only good for 10 minutes.
+
+Actually resetting the password happens at `PUT /password/reset/:token`, using the token from that email.
 
 ### Product Routes
 
-Anyone can look at products — `GET /products` returns the full list, and it supports searching by keyword, filtering by things like price or rating, and paginating through results. `GET /product/:id` returns a single product's details.
+Anyone can look at products  `GET /products` returns the full list, and it supports searching by keyword, filtering by things like price or rating, and paginating through results. 
 
-Creating, updating, and deleting products is locked down to admins only. `POST /product/new` creates one, `PUT /product/:id` updates it, and `DELETE /product/:id` removes it — all three require the user to be logged in and to have the admin role.
+`GET /product/:id` returns a single product's details.
+
+Creating, updating, and deleting products is locked down to admins only. 
+`POST /product/new` creates one, 
+`PUT /product/:id` updates it, and
+`DELETE /product/:id` removes it , all three require the user to be logged in and to have the admin role.
 
 ## How Login and Permissions Work Together
 
-When someone registers or logs in, the server signs a JWT with their user ID and sends it back as a cookie. From there, any route that needs a logged-in user runs it through the `isAuthenticatedUser` middleware, which pulls the token out of the cookie, verifies it, and attaches the matching user to the request. Routes that need more than "just logged in" — like the admin-only product routes — add `authorizeRoles` on top, which checks that the attached user actually has the right role before letting the request through.
+When someone registers or logs in, the server signs a JWT with their user ID and sends it back as a cookie. From there, any route that needs a logged-in user runs it through the `isAuthenticatedUser` middleware, which pulls the token out of the cookie, verifies it, and attaches the matching user to the request. Routes that need more than "just logged in" ,like the admin-only product routes ,add `authorizeRoles` on top, which checks that the attached user actually has the right role before letting the request through.
 
 ## Handling Errors
 
