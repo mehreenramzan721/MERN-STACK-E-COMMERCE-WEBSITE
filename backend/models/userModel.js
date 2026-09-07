@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -45,11 +46,11 @@ const userSchema = new mongoose.Schema({
 
 // it will become an event
 userSchema.pre('save', async function (next) {
-    // if we are updating the user and not changing the password, we don't want to hash the password again
     if (!this.isModified('password')) {
-        next();
+        return next();
     }
     this.password = await bcrypt.hash(this.password, 10);
+    next();
 })
 
 // JWT token
@@ -68,4 +69,21 @@ userSchema.methods.comparePassword = async function (enteredPassword) {
     //  and enteredPassword is the password entered by the user during login.
     //  The bcrypt.compare function will hash the enteredPassword and compare it with the hashed password stored in the database. If they match, it will return true, otherwise false.
 }
+
+// generating password reset token
+userSchema.methods.getResetPasswordToken = function () {
+    // generating token 
+    // we are using crypto module to generate a random token. The randomBytes function generates a buffer of random bytes, and we convert it to a hex string using the toString('hex') method.
+    const resetToken = crypto.randomBytes(20).toString('hex');
+
+    // hashing and add to userSchema
+    this.resetPasswordToken = crypto
+        .createHash('sha256')
+        .update(resetToken)
+        .digest('hex');
+
+    this.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+    return resetToken;
+};
 module.exports = mongoose.model('User', userSchema);

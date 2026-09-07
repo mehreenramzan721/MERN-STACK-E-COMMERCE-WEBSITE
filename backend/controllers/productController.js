@@ -6,6 +6,10 @@ const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middleware/catchAsyncErrors');
 // create product -- Admin
 exports.createProduct = catchAsyncErrors(async (req, res, next) => {
+
+    // the id of the user who is creating the product will be stored in the product document, so that we can know which user created which product. This is useful for tracking and managing products in the system.
+    req.body.user = req.user.id;
+
     const product = await Product.create(req.body);
     res.status(201).json({
         success: true,
